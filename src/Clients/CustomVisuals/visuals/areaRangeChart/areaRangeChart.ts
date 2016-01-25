@@ -2,7 +2,7 @@
  *  Power BI Visualizations
  *
  *  Copyright (c) Microsoft Corporation
- *  All rights reserved. 
+ *  All rights reserved.
  *  MIT License
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -11,14 +11,14 @@
  *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *  copies of the Software, and to permit persons to whom the Software is
  *  furnished to do so, subject to the following conditions:
- *   
- *  The above copyright notice and this permission notice shall be included in 
+ *
+ *  The above copyright notice and this permission notice shall be included in
  *  all copies or substantial portions of the Software.
- *   
- *  THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ *
+ *  THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
@@ -63,11 +63,10 @@ module powerbi.visuals.samples {
     }
 
     export interface AreaRangeChartData /*extends LineChartData*/ {
-        
+
         categoryMetadata: DataViewMetadataColumn;
         hasHighlights?: boolean;
-        
-        
+
         series: LineChartSeries[];
         isScalar?: boolean;
         dataLabelsSettings: PointDataLabelsSettings;
@@ -83,13 +82,11 @@ module powerbi.visuals.samples {
         yAxisProperties?: IAxisProperties;
         settings?: AreaRangeChartSettings;
         formatter?: IValueFormatter;
-        
+
         lowerMeasureIndex: number;
         upperMeasureIndex: number;
-        
-
     }
-    
+
     export class AreaRangeChart implements IVisual {
 
         private static properties = {
@@ -256,7 +253,7 @@ module powerbi.visuals.samples {
         private margin: IMargin;
         private legend: ILegend;
 
-        private dataViewCat: DataViewCategorical;        
+        private dataViewCat: DataViewCategorical;
         private data: AreaRangeChartData;
 
         private static DefaultSettings: AreaRangeChartSettings = {
@@ -275,7 +272,7 @@ module powerbi.visuals.samples {
             right: 20,
             left: 40,
         };
-        
+
         private static DefaultViewport: IViewport = {
             width: 50,
             height: 50
@@ -323,11 +320,11 @@ module powerbi.visuals.samples {
                 .append('g')
                 .classed(AreaRangeChart.Axis.class, true);
         }
-       
+
         private isSizeAvailable(viewport: IViewport): boolean {
-            if ((viewport.height < AreaRangeChart.DefaultViewport.height) || 
+            if ((viewport.height < AreaRangeChart.DefaultViewport.height) ||
                 (viewport.width < AreaRangeChart.DefaultViewport.width)) {
-                    return false; 
+                    return false;
             }
             return true;
         }
@@ -336,7 +333,7 @@ module powerbi.visuals.samples {
             if (!options.dataViews || !options.dataViews[0]) {
                 return;
             }
-            
+
             var dataView = options.dataViews[0];
             if (!dataView ||
                 !dataView.categorical ||
@@ -346,31 +343,31 @@ module powerbi.visuals.samples {
                     this.clearChart();
                     return;
             }
-            
+
             if (!this.isSizeAvailable(options.viewport)) {
                 this.clearChart();
                 return;
             }
-   
-            this.setSize(options.viewport);            
+
+            this.setSize(options.viewport);
             this.setData(options.dataViews);
 
             if (typeof(this.data) === 'undefined') {
                 this.clearChart();
                 return;
             }
-            
+
             this.calculateAxesProperties(null);
             this.render(options.suppressAnimations);
         }
- 
+
         public update(options: VisualUpdateOptions): void {
             if (!options.dataViews || !options.dataViews[0]) {
                 return;
             }
             this.updateInternal(options);
         }
-        
+
         private static getColor(
             colorHelper: ColorHelper,
             hasDynamicSeries: boolean,
@@ -388,7 +385,7 @@ module powerbi.visuals.samples {
                 objects = values[seriesIndex].source.objects;
             }
 
-            return hasDynamicSeries && groupedIdentity 
+            return hasDynamicSeries && groupedIdentity
                 ? colorHelper.getColorForSeriesValue(objects, values.identityFields, groupedIdentity.name)
                 : colorHelper.getColorForMeasure(objects, values[seriesIndex].source.queryName);
         }
@@ -417,10 +414,9 @@ module powerbi.visuals.samples {
                         if (dvCategories && dvCategories.length > 0 && dvCategories[0].source && dvCategories[0].source.type)
                             categoryType = dvCategories[0].source.type;
 
-                    
                         //var axisType = lineChartProps.categoryAxis.axisType
                         var axisType = AreaRangeChart.properties.general.formatString;
-                                                
+
                         var convertedData = AreaRangeChart.converter(
                             dataView,
                             valueFormatter.format(null),
@@ -432,8 +428,7 @@ module powerbi.visuals.samples {
                 }
             }
         }
-        
-        
+
         public static converter(dataView: DataView, blankCategoryValue: string, colors: IDataColorPalette, isScalar: boolean, interactivityService?: IInteractivityService): AreaRangeChartData {
             var categorical = dataView.categorical;
             var category = categorical.categories && categorical.categories.length > 0
@@ -484,13 +479,13 @@ module powerbi.visuals.samples {
 
             var lowerMeasureIndex = DataRoleHelper.getMeasureIndexOfRole(grouped, AreaRangeChart.RoleNames.Lower);
             var upperMeasureIndex = DataRoleHelper.getMeasureIndexOfRole(grouped, AreaRangeChart.RoleNames.Upper);
-     
+
             if (lowerMeasureIndex < 0 || upperMeasureIndex < 0) {
                 return;
             }
-            
+
             seriesLen = grouped.length;
-            
+
             for (var seriesIndex = 0; seriesIndex < seriesLen; seriesIndex++) {
                 var column = categorical.values[seriesIndex];
                 var valuesMetadata = column.source;
@@ -513,7 +508,6 @@ module powerbi.visuals.samples {
                 }
 
                 var dataPointLabelSettings = (seriesLabelSettings) ? seriesLabelSettings : defaultLabelSettings;
-                
 
                 for (var categoryIndex = 0, len = column.values.length; categoryIndex < len; categoryIndex++) {
                     var categoryValue = categoryValues[categoryIndex];
@@ -595,7 +589,7 @@ module powerbi.visuals.samples {
 
             xAxisCardProperties = CartesianHelper.getCategoryAxisProperties(dataView.metadata);
             var valueAxisProperties = CartesianHelper.getValueAxisProperties(dataView.metadata);
-             
+
             // Convert to DataViewMetadataColumn
             var valuesMetadataArray: powerbi.DataViewMetadataColumn[] = [];
             if (values) {
@@ -624,7 +618,7 @@ module powerbi.visuals.samples {
                 settings: settings
             };
         }
-        
+
         private clearChart(): void {
             this.chart.selectAll('*').remove();
             this.axisY.selectAll('*').remove();
@@ -635,7 +629,7 @@ module powerbi.visuals.samples {
             var duration = AnimatorCommon.GetAnimationDuration(this.animator, suppressAnimations);
             var result: CartesianVisualRenderResult;
             var data = this.data;
-            
+
             if (!data) {
                 this.clearChart();
                 return;
@@ -643,8 +637,7 @@ module powerbi.visuals.samples {
 
             this.renderAxis(data, duration);
             this.renderChart(data, duration);
-            
-            
+
             //calculateLegend
             var legendData = this.createLegendDataPoints(0);
 
@@ -652,9 +645,9 @@ module powerbi.visuals.samples {
                 LegendData.update(legendData, data.settings.legend);
                 this.legend.changeOrientation(data.settings.legend.position);
             }
-            
+
             var isDrawLegend = false;
-            
+
             if (isDrawLegend) {
                 this.legend.drawLegend(legendData, this.viewport);
             }
@@ -667,7 +660,7 @@ module powerbi.visuals.samples {
 
             height = viewport.height - this.margin.top - this.margin.bottom;
             width = viewport.width - this.margin.left - this.margin.right;
-            
+
             height = Math.max(height, AreaRangeChart.DefaultViewport.height);
             width  = Math.max(width, AreaRangeChart.DefaultViewport.width);
 
@@ -754,7 +747,7 @@ module powerbi.visuals.samples {
 
             this.data.xAxisProperties = this.getXAxisProperties();
             this.data.yAxisProperties = this.getYAxisProperties();
-            
+
             return [this.data.xAxisProperties, this.data.yAxisProperties];
         }
 
@@ -786,15 +779,15 @@ module powerbi.visuals.samples {
 
         private getXAxisProperties(): IAxisProperties {
             var data = this.data;
-            
+
             var origCatgSize = data.series && data.series.length > 0 ? data.series[0].data.length : 0;
             var categoryThickness = CartesianChart.getCategoryThickness(data.series, origCatgSize, this.viewport.width, xDomain, data.isScalar, false);
 
             var categoryDataType: ValueType = AxisHelper.getCategoryValueType(data.categoryMetadata);
-            
+
             var xDomain = AxisHelper.createDomain(data.series, categoryDataType, data.isScalar, null);
             var xMetaDataColumn: DataViewMetadataColumn = data.categoryMetadata;
-            
+
             var xAxisProperties = AxisHelper.createAxis({
                 pixelSpan: this.viewport.width,
                 dataDomain: xDomain,
@@ -816,10 +809,10 @@ module powerbi.visuals.samples {
 
             return xAxisProperties;
         }
-        
+
         /**
          * Creates a [min,max] from your Cartiesian data values.
-         * 
+         *
          * @param data The series array of CartesianDataPoints.
          * @param includeZero Columns and bars includeZero, line and scatter do not.
          */
@@ -830,13 +823,13 @@ module powerbi.visuals.samples {
 
             var minY0 = <number>d3.min(data,(kv) => { return d3.min(kv.data, d => { return d.y0; }); });
             var minY1 = <number>d3.min(data, (kv) => { return d3.min(kv.data, d => { return d.y1; }); });
-            
+
             var maxY0 = <number>d3.max(data, (kv) => { return d3.max(kv.data, d => { return d.y0; }); });
             var maxY1 = <number>d3.max(data, (kv) => { return d3.max(kv.data, d => { return d.y1; }); });
-            
+
             var minY = Math.min(minY0, minY1);
             var maxY = Math.max(maxY0, maxY1);
-            
+
             if (includeZero) {
                 return [Math.min(minY, 0), Math.max(maxY, 0)];
             }
@@ -932,10 +925,10 @@ module powerbi.visuals.samples {
             var closestValueIndex: number = -1;
             var minDistance = Number.MAX_VALUE;
             for (var i in xAxisValues) {
-                
+
                 var element = <AreaRangeChartDataPoint>xAxisValues[i];
                 var value = isScalar ? element.categoryValue : element.categoryIndex;
-                
+
                 var distance = Math.abs(currentX - value);
                 if (distance < minDistance) {
                     minDistance = distance;
@@ -1007,7 +1000,7 @@ module powerbi.visuals.samples {
                 dataPoints: legendDataPoints
             };
         }
-        
+
         private enumerateLegend(enumeration: ObjectEnumerationBuilder): ObjectEnumerationBuilder {
             var data = this.data;
 

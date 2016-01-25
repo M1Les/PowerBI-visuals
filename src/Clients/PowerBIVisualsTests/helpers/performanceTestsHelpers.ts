@@ -2,7 +2,7 @@
 *  Power BI Visualizations
 *
 *  Copyright (c) Microsoft Corporation
-*  All rights reserved. 
+*  All rights reserved.
 *  MIT License
 *
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -11,14 +11,14 @@
 *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 *  copies of the Software, and to permit persons to whom the Software is
 *  furnished to do so, subject to the following conditions:
-*   
-*  The above copyright notice and this permission notice shall be included in 
+*
+*  The above copyright notice and this permission notice shall be included in
 *  all copies or substantial portions of the Software.
-*   
-*  THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-*  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-*  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-*  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+*
+*  THE SOFTWARE IS PROVIDED *AS IS*, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+*  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+*  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+*  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 *  THE SOFTWARE.
@@ -487,6 +487,91 @@ module powerbitests.performanceTestsHelpers {
                     }
                 };
 
+            case "differenceAreaChart":
+                var sampleDataBivariate = [
+                    [
+                        [0, 2, 4, 2, 2, 0],
+                        [1, 3, 6, 3, 4, 1]
+                    ]
+                ];
+
+                var fieldExprBivariate = powerbi.data.SQExprBuilder.fieldExpr({ column: { schema: 's', entity: "table1", name: "country" } });
+                var categoryValuesBivariate = ["Australia", "Canada", "France", "Germany", "United Kingdom", "United States"];
+                var categoryIdentitiesBivariate = categoryValuesBivariate.map(function (value) {
+                    let exprBivariate = powerbi.data.SQExprBuilder.equal(fieldExprBivariate, powerbi.data.SQExprBuilder.text(value));
+                    return powerbi.data.createDataViewScopeIdentity(exprBivariate);
+                });
+
+                // Metadata, describes the data columns, and provides the visual with hints
+                // so it can decide how to best represent the data
+                let dataViewMetadataBivariate: powerbi.DataViewMetadata = {
+                    columns: [
+                        {
+                            displayName: 'Country',
+                            queryName: 'Country',
+                            type: powerbi.ValueType.fromDescriptor({ text: true }),
+                            roles: {
+                                Category: true
+                            }
+                        },
+                        {
+                            displayName: 'District',
+                            queryName: 'District',
+                            type: powerbi.ValueType.fromDescriptor({ text: true }),
+                            roles: {
+                                Series: true
+                            }
+                        },
+                        {
+                            displayName: 'Sales Amount (2014)',
+                            isMeasure: true,
+                            format: "$0,000.00",
+                            queryName: 'district',
+                            roles: {
+                                Low: true
+                            },
+                            type: powerbi.ValueType.fromDescriptor({ numeric: true }),
+                            objects: { dataPoint: { fill: { solid: { color: 'purple' } } } },
+                        },
+                        {
+                            displayName: 'Sales Amount (2015)',
+                            isMeasure: true,
+                            format: "$0,000.00",
+                            queryName: 'district',
+                            roles: {
+                                High: true
+                            },
+                            type: powerbi.ValueType.fromDescriptor({ numeric: true })
+                        }
+                    ]
+                };
+
+                var columnsBivariate = [
+                    {
+                        source: dataViewMetadataBivariate.columns[2],
+                        // Sales Amount for 2014
+                        values: sampleDataBivariate[0][0],
+                    },
+                    {
+                        source: dataViewMetadataBivariate.columns[3],
+                        // Sales Amount for 2015
+                        values: sampleDataBivariate[0][1],
+                    }
+                ];
+
+                var dataValuesBivariate: DataViewValueColumns = DataViewTransform.createValueColumns(columnsBivariate);
+
+                return {
+                    metadata: dataViewMetadataBivariate,
+                    categorical: {
+                        categories: [{
+                            source: dataViewMetadataBivariate.columns[0],
+                            values: categoryValuesBivariate,
+                            identity: categoryIdentitiesBivariate
+                        }],
+                        values: dataValuesBivariate,
+                    }
+                };
             default:
                 var fieldExpr = powerbi.data.SQExprBuilder.fieldExpr({ column: { schema: "s", entity: "table1", name: "country" } });
 
